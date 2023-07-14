@@ -196,7 +196,7 @@ class MainFrame(wx.Frame):
 		display_box = wx.StaticBox(main_panel, wx.ID_ANY, "Display")
 		display_box_sizer = wx.StaticBoxSizer(display_box, wx.VERTICAL)
 		
-		self.search_img = wx.Button(main_panel, -1, "Search images")
+		self.search_img = wx.Button(main_panel, -1, "Search Images")
 		self.search_img.Bind(wx.EVT_BUTTON, self.on_search)
 		self.random_img = wx.Button(main_panel, -1, "Open random image")
 		self.random_img.Bind(wx.EVT_BUTTON, self.on_random)
