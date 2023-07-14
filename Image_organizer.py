@@ -9,6 +9,7 @@ from pubsub import pub
 display_icon_list = functions.retrieve_variables(0)
 program_folder = functions.retrieve_variables(1)
 icons_folder = functions.retrieve_variables(2)
+print("updated")
 ######################
 tmp_folder = os.path.abspath("image_folder/.temp_folder/") + "/"
 thumbs_folder = os.path.abspath(".thumbs/img_thumbs/") + "/"
