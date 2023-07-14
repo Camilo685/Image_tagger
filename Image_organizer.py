@@ -22,6 +22,7 @@ for folder in folders:
 		os.makedirs(folder)
 
 def main():
+	print("image_organizer")
 	app = wx.App()
 	frame = MainFrame()
 	app.MainLoop()
