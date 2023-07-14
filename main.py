@@ -8,7 +8,8 @@ def save_to_pickle(to_dump):
 	with open("program_variables", "wb") as pickle_file:
 		pickle.dump(to_dump, pickle_file)
 
-def main():		
+def main():
+	print("main")
 	image_organizer_script_name = functions.retrieve_variables(3)
 	functions_script = functions.retrieve_variables(4)
 	main_script = functions.retrieve_variables(5)
