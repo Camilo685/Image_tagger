@@ -39,6 +39,7 @@ def is_image(path_name = program_folder, check = False):
 	return images_selected
 
 def check_icons():
+	print("functions")
 	icon_list = is_image(path_name = icons_folder, check = True)
 	mssng = []
 	for icon_idx, icon in enumerate(display_icon_list + checkbox_icons):
