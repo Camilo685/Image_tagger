@@ -4,7 +4,7 @@ import pathlib
 import functions
 from PIL import Image, ImageDraw
 from pubsub import pub
-
+print("image_organizer")
 ###Shared variables###
 display_icon_list = functions.retrieve_variables(0)
 program_folder = functions.retrieve_variables(1)
