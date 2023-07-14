@@ -3,7 +3,7 @@ from github import Github
 
 ###Pickle structure###
 #[main_last_commit, functions_last_commit, main_last_commit]
-
+print("main")
 def save_to_pickle(to_dump):
 	with open("program_variables", "wb") as pickle_file:
 		pickle.dump(to_dump, pickle_file)
