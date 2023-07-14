@@ -3,7 +3,7 @@ from github import Github
 
 ###Pickle structure###
 #[main_last_commit, functions_last_commit, main_last_commit]
-print("main")
+
 def save_to_pickle(to_dump):
 	with open("program_variables", "wb") as pickle_file:
 		pickle.dump(to_dump, pickle_file)
@@ -26,7 +26,8 @@ def main():
 
 	to_dump = [main_last_commit, functions_last_commit, main_last_commit]
 	to_update = []
-
+	reset = False
+	
 	try:
 		with open("program_variables", "rb") as pickle_file:
 			data = pickle.load(pickle_file)
@@ -39,6 +40,7 @@ def main():
 			to_update.append(functions_script)
 		if data[2] != main_last_commit:
 			to_update.append(main_script)
+			reset = True
 		if to_update:
 			save_to_pickle(to_dump)
 
@@ -46,6 +48,8 @@ def main():
 
 	if missing_icons or to_update:
 		functions.update_information(missing_icons = missing_icons, to_update = to_update)
+
+	return reset
 
 if __name__ == "__main__":
 	main()
