@@ -9,7 +9,7 @@ def save_to_pickle(to_dump):
 		pickle.dump(to_dump, pickle_file)
 
 def main():
-	print("main2")
+	print("main3")
 	image_organizer_script_name = functions.retrieve_variables(3)
 	functions_script = functions.retrieve_variables(4)
 	main_script = functions.retrieve_variables(5)
