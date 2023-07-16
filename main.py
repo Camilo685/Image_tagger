@@ -5,7 +5,7 @@ from github import Github
 #[exe_last_commit, display_icon_list, program_folder, tmp_folder, thumbs_folder, temp_thumbs_folder, icons_folder]
 
 def main():
-	from_script = False
+	from_script = True
 	executable_name = "image_organizer"
 	#display_icon_list = ["previous.png", "play.png", "next.png", "pause.png", "stop.png"]
 	display_icon_list = ["previous", "play", "next", "pause"]
