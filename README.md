@@ -11,6 +11,7 @@ If you wish to run the scripts manually (Python) you will need to get the 4 .py 
 
 For non distribution users
 Requirements (later versions should work too!):
+
 python==3.10
 
 filetype==1.2.0
