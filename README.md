@@ -12,12 +12,19 @@ If you wish to run the scripts manually (Python) you will need to get the 4 .py 
 For non distribution users
 Requirements (later versions should work too!):
 python==3.10
+
 filetype==1.2.0
+
 GitPython==3.1.32
+
 Pillow==9.0.1
+
 PyGithub==1.59.0
+
 Pypubsub==4.0.3
+
 Send2Trash==1.8.0
+
 wxPython==4.2.0
 
 How it works?
