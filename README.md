@@ -32,7 +32,7 @@ The program gives an option to add descriptive tags to the images selected, the 
 To save/discard the ones not modified close the panel and a promp will appear asking for instructions
 In the search panel all the saved images can be filtered to look for ones that fit an specific set of tags.
 
-![Screenshot from 2023-07-17 00-24-11](https://github.com/Camilo685/image_organizer/assets/46032121/e2b536ac-7899-4152-8724-8ee6b501b0d5)
 ![Screenshot from 2023-07-17 00-23-43](https://github.com/Camilo685/image_organizer/assets/46032121/977628a6-d647-4137-a334-f30abce30a69)
+![Screenshot from 2023-07-17 00-24-11](https://github.com/Camilo685/image_organizer/assets/46032121/e2b536ac-7899-4152-8724-8ee6b501b0d5)
 
 Thank you for your attention!
