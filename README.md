@@ -18,8 +18,6 @@ python==3.10
 
 filetype==1.2.0
 
-GitPython==3.1.32
-
 Pillow==9.0.1
 
 PyGithub==1.59.0
