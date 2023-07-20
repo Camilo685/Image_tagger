@@ -24,6 +24,8 @@ def main():
 	try:
 		data = functions.save_load_file(op_type = "rb")
 		to_dump += data[2:]
+		if not to_dump[0]:
+			to_dump[0] = data[0]
 	except:
 		app = wx.App()
 		ok_folder = False
@@ -58,7 +60,7 @@ def main():
 	else:
 		change = False
 		if exe_last_commit and data[0] != exe_last_commit:
-			update = True if not from_script else False
+			update = True
 			change = True
 		if data[4] != (os.getcwd() + "/.thumbs/img_thumbs/"):
 			data[4] = os.getcwd() + "/.thumbs/img_thumbs/"
@@ -68,7 +70,7 @@ def main():
 		if change:
 			functions.save_load_file(to_dump = to_dump)
 
-	missing_icons = functions.update_information(display_icon_list = display_icon_list, icons_folder = to_dump[6], update = update, from_script = from_script, exe_name = executable_name)
+	missing_icons = functions.update_information(display_icon_list = display_icon_list, icons_folder = to_dump[6], update = update, exe_name = executable_name)
 
 	return update
 
