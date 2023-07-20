@@ -16,14 +16,6 @@ def save_load_file(file_name = "program_variables", to_dump = None, op_type = "w
 				tmp_file.write(tmp + "\n")
 			else:
 				pickle.dump(to_dump, tmp_file)
-			
-def write_load_json(op_type, json_name, to_dump = None):
-	with open(json_name, op_type) as json_file:
-		if op_type == "r":
-			return json.load(json_file)
-		else:
-			tmp = json.dumps(dict(sorted(to_dump.items())), indent = 4)
-			json_file.write(tmp + "\n")
 
 def is_image(path_name = None, check = False):
 	images_selected = []
@@ -44,7 +36,7 @@ def is_image(path_name = None, check = False):
 					images_selected.append(tmp_nm if tmp_nm else fl_nm)
 	return images_selected
 
-def update_information(display_icon_list = None, icons_folder = None, update = False, from_script = False, exe_name = None):
+def update_information(display_icon_list = None, icons_folder = None, update = False, exe_name = None):
 	checkbox_icons = ["marked_checkbox", "unmarked_checkbox"]
 	icon_list = is_image(path_name = icons_folder, check = True)
 	missing_icons = []
@@ -57,7 +49,7 @@ def update_information(display_icon_list = None, icons_folder = None, update = F
 		if missing_bool:
 			missing_icons.append(icon)
 	
-	if missing_icons or (update and not from_script):
+	if missing_icons or update:
 		zip_url = "https://codeload.github.com/Camilo685/image_organizer/zip/refs/heads/main"
 		zip_req = requests.get(zip_url)
 		with open("tmp.zip",'wb') as zip_file:
@@ -75,7 +67,7 @@ def update_information(display_icon_list = None, icons_folder = None, update = F
 						width = 30 if tmp_img.size[0] > 30 else tmp_img.size[0]
 						thumb(icon_file, width, source = repo_dir + "/icons/", target_folder = icons_folder)
 						break
-		if update and not from_script:
+		if update:
 			os.remove(os.getcwd() + "/" + exe_name)
 			shutil.move(repo_dir + "/" + exe_name, os.getcwd() + "/" + exe_name)
 			os.chmod(os.getcwd() + "/" + exe_name, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
