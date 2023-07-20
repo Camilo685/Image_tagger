@@ -167,8 +167,8 @@ class MyList(wx.ListCtrl):
 
 		self.image_list = wx.ImageList(16, 16)
 		
-		unmarked_checkbox_bitmap = img_to_bmp(Image.open(icons_folder + "unmarked_checkbox.png").convert("RGBA"), True)
-		marked_checkbox_bitmap = img_to_bmp(Image.open(icons_folder + "marked_checkbox.png").convert("RGBA"), True)
+		unmarked_checkbox_bitmap = wx.Bitmap(wx.Image(icons_folder + "unmarked_checkbox.jpg"), wx.BITMAP_TYPE_JPEG)
+		marked_checkbox_bitmap = wx.Bitmap(wx.Image(icons_folder + "marked_checkbox.jpg"), wx.BITMAP_TYPE_JPEG)
 
 		self.image_list.Add(unmarked_checkbox_bitmap)
 		self.image_list.Add(marked_checkbox_bitmap)
@@ -1104,7 +1104,8 @@ class SearchFrame(wx.Frame):
 		self.x_2, self.y_2 = event.GetPosition()
 
 		if not self.x_1 == self.x_2 and not self.y_1 == self.y_2:
-			self.OnPaint()	
+			self.OnPaint()
+			self.grid_panel.Refresh()
 		event.Skip()
 	
 	def on_left_up(self, event):
