@@ -584,18 +584,20 @@ class SearchFrame(wx.Frame):
 		
 		####Grid panel####
 		
-		self.grid_panel = wx.Panel(self.sf_main_panel)		
+		grid_sizer = wx.BoxSizer(wx.VERTICAL)
+		
+		self.grid_panel = wx.Panel(parent = self.sf_main_panel, size = (1060, 635))
 		self.grid_panel.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
 
-		images_box = wx.StaticBox(self.grid_panel, wx.ID_ANY, "Preview")
+		images_box = wx.StaticBox(parent = self.grid_panel, label = "Preview")
 		images_box_sizer = wx.StaticBoxSizer(images_box, wx.VERTICAL)
 		
 		self.images_box_grid = wx.GridSizer(cols = 5, vgap = 5, hgap = 5)
 		
-		self.next_pg_btn = wx.Button(self.grid_panel, -1, label = "Next page", name = "next_pg_btn")
+		self.next_pg_btn = wx.Button(self.sf_main_panel, -1, label = "Next page", name = "next_pg_btn")
 		self.next_pg_btn.Bind(wx.EVT_BUTTON, self.next_prev_btn)
 		
-		self.prev_pg_btn = wx.Button(self.grid_panel, -1, label = "Previous page", name = "prev_pg_btn")
+		self.prev_pg_btn = wx.Button(self.sf_main_panel, -1, label = "Previous page", name = "prev_pg_btn")
 		self.prev_pg_btn.Bind(wx.EVT_BUTTON, self.next_prev_btn)
 		self.prev_pg_btn.Disable()
 		
@@ -605,9 +607,12 @@ class SearchFrame(wx.Frame):
 		nx_pv_sizer.Add(self.next_pg_btn, 0, wx.EXPAND | wx.ALL, 5)
 		
 		images_box_sizer.Add(self.images_box_grid, 0, wx.EXPAND | wx.ALL, 5)
-		images_box_sizer.Add(nx_pv_sizer, 0, wx.EXPAND | wx.ALL, 5)
+		#images_box_sizer.Add(nx_pv_sizer, 0, wx.EXPAND | wx.ALL, 5)
 		
 		self.grid_panel.SetSizer(images_box_sizer)
+		
+		grid_sizer.Add(self.grid_panel, 0, wx.EXPAND | wx.ALL | wx.FIXED_MINSIZE, 5)
+		grid_sizer.Add(nx_pv_sizer, 0, wx.EXPAND | wx.ALL, 5)
 
 		######################
 		
@@ -677,7 +682,7 @@ class SearchFrame(wx.Frame):
 		################################################
 		
 		main_sizer.Add(tag_box_sizer, 0, wx.ALL, 5)
-		main_sizer.Add(self.grid_panel, 0, wx.EXPAND | wx.ALL, 5)		
+		main_sizer.Add(grid_sizer, 0, wx.ALL, 5)
 		
 		self.sf_main_panel.SetSizer(main_sizer)
 		self.sf_main_panel.Layout()
@@ -687,6 +692,7 @@ class SearchFrame(wx.Frame):
 		self.Show()
 		self.Center()
 		###Makes the window's size fixed###
+		self.SetSize(wx.DisplaySize())
 		self.SetMinSize(wx.DisplaySize())
 		###For some reason the image's info doesn't load properly if call immediatly###
 		wx.CallLater(100, self.grid_population)
@@ -1254,7 +1260,7 @@ class DisplayFrame(wx.Frame):
 
 		############# ctrl box #############
 
-		ctrl_box = wx.StaticBox(self.main_panel, wx.ID_ANY, "Controls")
+		ctrl_box = wx.StaticBox(parent = self.main_panel, label = "Controls")
 		ctrl_box_sizer = wx.StaticBoxSizer(ctrl_box, wx.HORIZONTAL)		
 		
 		self.button_icon_list = display_icon_list.copy()
@@ -1318,15 +1324,19 @@ class DisplayFrame(wx.Frame):
 		########################################
 		
 		############# img box #############
-
-		img_box = wx.StaticBox(self.main_panel, wx.ID_ANY, "Image")
+		
+		img_ctrl_sizer = wx.BoxSizer(wx.VERTICAL)
+		
+		img_box = wx.StaticBox(parent = self.main_panel, label = "Image", size = (1010, 605))
 		img_box_sizer = wx.StaticBoxSizer(img_box, wx.VERTICAL)
 		
-		self.img = wx.Image(240,240)
+		self.img = wx.Image(50, 50)
 		self.s_bmp = wxbmp.GenStaticBitmap(self.main_panel, -1, bitmap = wx.Bitmap(self.img))
 		
 		img_box_sizer.Add(self.s_bmp, 0, wx.ALIGN_CENTER | wx.ALL, 5)
-		img_box_sizer.Add(ctrl_box_sizer, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+		
+		img_ctrl_sizer.Add(img_box_sizer, 0, wx.FIXED_MINSIZE)
+		img_ctrl_sizer.Add(ctrl_box_sizer, 0, wx.ALIGN_CENTER)
 
 		###################################	
 
@@ -1358,6 +1368,7 @@ class DisplayFrame(wx.Frame):
 		self.add_descriptive_tag.Bind(wx.EVT_BUTTON, self.on_press)
 		
 		self.export_img = wx.Button(self.main_panel, -1, label = "Export images...", name = "export_img")
+#		self.export_img.Bind(wx.EVT_BUTTON, self.debugger)
 		self.export_img.Bind(wx.EVT_BUTTON, lambda event: export_images(event, self.img_selected, source = self.images_source))
 		
 		self.all_images = wx.Button(self.main_panel, -1, label = "Show images selected", name = "image_list")
@@ -1420,14 +1431,16 @@ class DisplayFrame(wx.Frame):
 		self.edit_controls(None)
 		
 		self.main_sizer.Add(self.tag_box_sizer, 0, wx.ALL, 5)
-		self.main_sizer.Add(img_box_sizer, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+		self.main_sizer.Add(img_ctrl_sizer, 0, wx.LEFT | wx.RIGHT, 5)
 		self.main_sizer.Add(self.edit_box_sizer, 0, wx.ALL, 5)
 		
 		self.main_panel.SetSizer(self.main_sizer)
 		self.main_panel.Layout()
 		self.main_sizer.Fit(self)
-		self.Centre()
 		self.Show()
+		self.SetSize((-1, wx.DisplaySize()[1]))
+		self.SetMinSize((1020, wx.DisplaySize()[1]))
+		self.Centre()
 	
 	def show_all(self, event):
 		if event.GetEventObject().GetName() == "image_list":
@@ -1768,7 +1781,7 @@ class DisplayFrame(wx.Frame):
 				self.current_tag_boxes[self.img_data_id] = ([empty_tag])
 				self.img_data_id += 1
 
-			self.img = functions.thumb(self.img_selected[self.current_image][0], 1000, source = program_folder, height = 580)
+			self.img = functions.thumb(self.img_selected[self.current_image][0], 1000, source = program_folder, height = 595)
 		else:
 			if self.general_tags:
 				tmp = []
@@ -1778,7 +1791,7 @@ class DisplayFrame(wx.Frame):
 					self.img_data_id += 1
 				self.current_tag_count = tag_count(tmp, working_tag_list = self.current_tag_count)
 			
-			self.img = functions.thumb(self.img_selected[self.current_image][0], 1000, source = self.images_source, height = 580)
+			self.img = functions.thumb(self.img_selected[self.current_image][0], 1000, source = self.images_source, height = 595)
 		self.b_alpha = True if self.img_selected[self.current_image][0].split(".")[-1] == "png" else False
 		self.s_bmp.SetBitmap(img_to_bmp(self.img, alpha = self.b_alpha))
 
@@ -1800,8 +1813,11 @@ class DisplayFrame(wx.Frame):
 			self.tag_list.InsertItem(self.tag_list.GetItemCount(), tag_cnt[0])
 
 	def debugger(self, event):
-		print("Current image's data")
-		print(self.current_tag_boxes)
+#		print("Current image's data")
+#		print(self.current_tag_boxes)
+#		print("\n")
+		print("Image's size")
+		print(self.img)
 		print("\n")
 #		print("Current tag list")
 #		print(self.tag_list_content)
@@ -1809,9 +1825,9 @@ class DisplayFrame(wx.Frame):
 #		print("Full data length")
 #		print(len(complete_dataset))
 #		print("\n")
-		print("Image list")
-		print(self.img_selected)
-		print("\n")
+#		print("Image list")
+#		print(self.img_selected)
+#		print("\n")
 #		print("Undo list")
 #		print(self.undo_list)
 #		print("\n")
@@ -1821,9 +1837,9 @@ class DisplayFrame(wx.Frame):
 #		print("Complete tag dataset")
 #		print(complete_tag_dataset)
 #		print("\n")
-		print("Working tag dataset")
-		print(self.current_tag_count)
-		print("\n")
+#		print("Working tag dataset")
+#		print(self.current_tag_count)
+#		print("\n")
 #		print("Images deleted")
 #		print(self.to_delete_img_list)
 #		print("\n")
