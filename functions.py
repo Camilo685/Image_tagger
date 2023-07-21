@@ -68,7 +68,7 @@ def update_information(display_icon_list = None, icons_folder = None, update = F
 						thumb(icon_file, width, source = repo_dir + "/icons/", target_folder = icons_folder)
 						break
 		if update:
-			os.remove(os.getcwd() + "/" + exe_name)
+			os.rename(exe_name, '(old)' + exe_name)
 			shutil.move(repo_dir + "/" + exe_name, os.getcwd() + "/" + exe_name)
 			os.chmod(os.getcwd() + "/" + exe_name, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 		shutil.rmtree(repo_dir)
