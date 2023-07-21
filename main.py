@@ -72,7 +72,7 @@ def main():
 
 	missing_icons = functions.update_information(display_icon_list = display_icon_list, icons_folder = to_dump[6], update = update, exe_name = executable_name)
 
-	return update
+	return update, executable_name
 
 if __name__ == "__main__":
 	main()
