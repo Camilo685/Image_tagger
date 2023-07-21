@@ -1,6 +1,6 @@
 # Image_organizer
 
-Distribution for linux: https://drive.google.com/file/d/1mdtcTjDWEdUbHoPKc67C0S_WY8F1ETqd/view?usp=sharing
+Distribution for linux: https://drive.google.com/file/d/1Wch-wcyCtZuMpOf3qZFnhontewc495RR/view?usp=sharing
 
 Distribution for windows: https://drive.google.com/file/d/1tQT-IuqQy3DZ4bnXKPiOg9Oxjmftmnim/view?usp=sharing
 
