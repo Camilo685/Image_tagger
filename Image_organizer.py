@@ -162,21 +162,24 @@ class OpenDirectoryDialog(wx.DirDialog):
 		super().__init__(parent = parent, message = message, defaultPath = defaultPath, style = wx.DD_DIR_MUST_EXIST)
 		
 class MyList(wx.ListCtrl):
-	def __init__(self, col_info, height = 400, parent = None, style = wx.LC_REPORT | wx.LC_HRULES):
+	def __init__(self, col_info, height = 400, parent = None, style = wx.LC_REPORT | wx.LC_HRULES, img_list = False):
 		super().__init__(parent = parent, size = (-1, height), style = style)
-
-		self.image_list = wx.ImageList(16, 16)
 		
-		unmarked_checkbox_bitmap = wx.Bitmap(wx.Image(icons_folder + "unmarked_checkbox.jpg"), wx.BITMAP_TYPE_JPEG)
-		marked_checkbox_bitmap = wx.Bitmap(wx.Image(icons_folder + "marked_checkbox.jpg"), wx.BITMAP_TYPE_JPEG)
+		if img_list:
+			self.image_list = wx.ImageList(16, 16)
+			
+			unmarked_checkbox_bitmap = wx.Bitmap(wx.Image(icons_folder + "unmarked_checkbox.jpg"), wx.BITMAP_TYPE_JPEG)
+#			unmarked_checkbox_bitmap = wx.ArtProvider.GetBitmap(wx.ART_CROSS_MARK, wx.ART_MENU, (16,16))
+			marked_checkbox_bitmap = wx.Bitmap(wx.Image(icons_folder + "marked_checkbox.jpg"), wx.BITMAP_TYPE_JPEG)
+#			marked_checkbox_bitmap = wx.ArtProvider.GetBitmap(wx.ART_TICK_MARK, wx.ART_MENU, (16,16))
 
-		self.image_list.Add(unmarked_checkbox_bitmap)
-		self.image_list.Add(marked_checkbox_bitmap)
-		self.SetImageList(self.image_list, wx.IMAGE_LIST_SMALL)
+			self.image_list.Add(unmarked_checkbox_bitmap)
+			self.image_list.Add(marked_checkbox_bitmap)
+			self.SetImageList(self.image_list, wx.IMAGE_LIST_SMALL)
 
-		for index, col_name in enumerate(col_info):
-			self.InsertColumn(col = index, heading = col_name[0], format = wx.LIST_FORMAT_CENTER, width = col_name[2])
-			if col_name[1]:
+		for col_name in col_info:
+			self.AppendColumn(heading = col_name[0], format = wx.LIST_FORMAT_CENTER, width = col_name[2])
+			if col_name[1] and img_list:
 				self.SetColumnImage(index, 0)
 
 class GeneralMessage(wx.GenericMessageDialog):
@@ -502,9 +505,9 @@ class Minuature_frame(wx.Dialog):
 			
 		for idx, mini in enumerate(self.to_show):			
 			if mini[0] in self.selected_img:
-				mini_static_bitmap = wxbmp.GenStaticBitmap(self.main_panel, -1, bitmap = wx.Bitmap(wx.Image(split_name(mini[0], images_source = self.images_source if not mini[-1] else None, mask = True, wd = 100), wx.BITMAP_TYPE_ANY)), name = str(idx))
+				mini_static_bitmap = wx.StaticBitmap(self.main_panel, bitmap = wx.Bitmap(wx.Image(split_name(mini[0], images_source = self.images_source if not mini[-1] else None, mask = True, wd = 100), wx.BITMAP_TYPE_ANY)), name = str(idx))
 			else:
-				mini_static_bitmap = wxbmp.GenStaticBitmap(self.main_panel, -1, bitmap = wx.Bitmap(wx.Image(split_name(mini[0], images_source = self.images_source if not mini[-1] else None, wd = 100), wx.BITMAP_TYPE_ANY)), name = str(idx))
+				mini_static_bitmap = wx.StaticBitmap(self.main_panel, bitmap = wx.Bitmap(wx.Image(split_name(mini[0], images_source = self.images_source if not mini[-1] else None, wd = 100), wx.BITMAP_TYPE_ANY)), name = str(idx))
 			if not self.deleted_imgs:
 				mini_static_bitmap.Bind(wx.EVT_LEFT_DCLICK, self.open_img)
 			mini_static_bitmap.Bind(wx.EVT_LEFT_UP, self.select_img)			
@@ -554,10 +557,11 @@ class SearchFrame(wx.Frame):
 		global complete_tag_dataset
 		
 		self.selected_bool = False
-		self.x_1, self.y_1, self.x_2, self.y_2 = -1, -1, -1, -1
+		self.x_1, self.y_1 = -1, -1
 		self.last_added = []
 		self.grid_szr_info = []
 		self.offset_info = [0, 0, 0, 0, 0, 0]
+		self.overlay = wx.Overlay()
 		
 		self.dataset = []
 		self.include_exclude_list = [[],[]]
@@ -619,7 +623,7 @@ class SearchFrame(wx.Frame):
 		####Create and load tag list####
 
 		col_info = [["Include", False, 95], ["Tags", False, 120], ["Exclude", False, 95]]
-		self.tag_selection_list = MyList(col_info, parent = self.sf_main_panel)
+		self.tag_selection_list = MyList(col_info, parent = self.sf_main_panel, img_list = True)
 		self.tag_selection_list.Bind(wx.EVT_LEFT_UP, handler = self.checkbox_clicked)
 		del col_info
 		
@@ -926,7 +930,7 @@ class SearchFrame(wx.Frame):
 			if h > self.offset_info[1]:
 				self.offset_info[1] = h
 			###Creates a static bitmap to by displayed###
-			temp_static_bitmap = wxbmp.GenStaticBitmap(self.grid_panel, -1, bitmap = bmp, name = str(index))
+			temp_static_bitmap = wx.StaticBitmap(self.grid_panel, bitmap = bmp, name = str(index))
 			temp_static_bitmap.Bind(wx.EVT_LEFT_DCLICK, self.on_open_edit)
 			temp_static_bitmap.Bind(wx.EVT_LEFT_UP, self.OnImageClicked)
 			###For the purpose of erasing the static images later###
@@ -1096,47 +1100,67 @@ class SearchFrame(wx.Frame):
 				self.exclude_all.SetValue(False)
 
 	def on_left_down(self, event):
-		if [event.GetEventType()] == wx.EVT_LEFT_DOWN.evtType:
-			self.x_1, self.y_1 = event.GetPosition()
-			
-			self.grid_panel.Bind(wx.EVT_MOTION, self.mouse_drag)
-			self.grid_panel.Bind(wx.EVT_LEFT_UP, self.on_left_up)
-			
-			if not wx.GetKeyState(wx.WXK_CONTROL):
-				self.on_deselected(None)
+		self.x_1, self.y_1 = event.GetPosition()
+		
+		self.grid_panel.Bind(wx.EVT_MOTION, self.mouse_drag)
+		self.grid_panel.Bind(wx.EVT_LEFT_UP, self.on_left_up)
+		for child in self.images_box_grid.GetChildren():
+			child.GetWindow().Unbind(wx.EVT_LEFT_UP, handler = self.OnImageClicked)
+			child.GetWindow().Bind(wx.EVT_MOTION, self.mouse_drag)
+			child.GetWindow().Bind(wx.EVT_LEFT_UP, self.on_left_up)
+		
+		if not wx.GetKeyState(wx.WXK_CONTROL):
+			self.on_deselected(None)
 		event.Skip()
 	
 	def mouse_drag(self, event):
-		self.x_2, self.y_2 = event.GetPosition()
+		if event.Dragging():
+			if event.GetEventObject().GetName() == "panel":
+				x_2, y_2 = event.GetPosition()
+			else:
+				for csb in self.current_static_bitmaps:
+					if event.GetEventObject().GetName() == str(csb[0]):
+						x_2, y_2 = csb[-1].GetPosition() + event.GetPosition()
+						break
 
-		if not self.x_1 == self.x_2 and not self.y_1 == self.y_2:
-			self.OnPaint()
-			self.grid_panel.Refresh()
+			if not self.x_1 == x_2 and not self.y_1 == y_2:
+				self.OnPaint(x_2, y_2)
+		else:
+			self.on_left_up(None)
 		event.Skip()
 	
 	def on_left_up(self, event):
 		self.grid_panel.Refresh()
-		self.x_1, self.y_1, self.x_2, self.y_2 = -1, -1, -1, -1	
+		self.x_1, self.y_1 = -1, -1
 		self.last_added.clear()
 		self.grid_panel.Unbind(wx.EVT_MOTION, handler = self.mouse_drag)
 		self.grid_panel.Unbind(wx.EVT_LEFT_UP, handler = self.on_left_up)
+		for child in self.images_box_grid.GetChildren():
+			child.GetWindow().Unbind(wx.EVT_MOTION, handler = self.mouse_drag)
+			child.GetWindow().Unbind(wx.EVT_LEFT_UP, handler = self.on_left_up)
+			child.GetWindow().Bind(wx.EVT_LEFT_UP, self.OnImageClicked)
 		if self.clicked_images:
 			self.sf_main_panel.Bind(wx.EVT_LEFT_UP, self.on_deselected)
 			self.grid_panel.Bind(wx.EVT_LEFT_UP, self.on_deselected)
 		else:
 			self.on_deselected(None)
 		
-	def OnPaint(self):
+	def OnPaint(self, x_2, y_2):
 		dc = wx.ClientDC(self.grid_panel)
-		color = wx.Colour(189, 195, 199, 100)
-		dc.SetPen(wx.Pen((238, 238, 238)))
-		dc.SetBrush(wx.Brush(color))
-		dc.DrawRectangle(self.x_1, self.y_1, self.x_2 - self.x_1, self.y_2 - self.y_1)
+		odc = wx.DCOverlay(self.overlay, dc)
+		odc.Clear()
+		dc = wx.GCDC(dc)
+		
+		
+		rect = wx.Rect(self.x_1, self.y_1, x_2 - self.x_1, y_2 - self.y_1)
+		dc.SetPen(wx.Pen(wx.Colour(189, 195, 199), 1))
+		dc.SetBrush(wx.Brush(wx.Colour(189, 195, 199, 100)))
+		dc.DrawRectangle(rect)
 		
 		if self.grid_szr_info:
-			self.drag_select()
+			self.drag_select(x_2, y_2)
 	
-	def drag_select(self):
+	def drag_select(self, x_2, y_2):
 		max_w, max_h, org_x, org_y, v_gap, h_gap = self.offset_info
 		max_w_off = max_w + v_gap
 		max_h_off = max_h + h_gap
@@ -1146,8 +1170,8 @@ class SearchFrame(wx.Frame):
 		row_length = len(self.grid_szr_info[0])
 		
 		###Check if the user is selecting from left to right and top to bottom###
-		x1, x2, inv_x = (self.x_1, self.x_2, False) if self.x_1 < self.x_2 else (self.x_2, self.x_1, True)
-		y1, y2, inv_y = (self.y_1, self.y_2, False) if self.y_1 < self.y_2 else (self.y_2, self.y_1, True)
+		x1, x2, inv_x = (self.x_1, x_2, False) if self.x_1 < x_2 else (x_2, self.x_1, True)
+		y1, y2, inv_y = (self.y_1, y_2, False) if self.y_1 < y_2 else (y_2, self.y_1, True)
 		
 		col_range_1 = int((x1 - org_x) / max_w_off)
 		col_range_2 = int((x2 - org_x) / max_w_off) + 1
@@ -1164,7 +1188,7 @@ class SearchFrame(wx.Frame):
 				try:
 					img_cord = self.grid_szr_info[h_idx][w_idx]
 					###See if the user's selection box and the image's coordinates are overlapping###
-					if max(0, min(x2, img_cord[2]) - max(x1, img_cord[0])) > 0 and max(0, min(y2, img_cord[3]) - max(y1, img_cord[1])):
+					if (x1 < img_cord[2] and y1 < img_cord[3]) and (x2 > img_cord[0] and y2 > img_cord[1]):
 						img_slt.append(((h_idx + 1) * row_length) - (row_length - w_idx))
 				except:
 					###In case the overlapping space doesn't have an assigned image###
@@ -1331,7 +1355,7 @@ class DisplayFrame(wx.Frame):
 		img_box_sizer = wx.StaticBoxSizer(img_box, wx.VERTICAL)
 		
 		self.img = wx.Image(50, 50)
-		self.s_bmp = wxbmp.GenStaticBitmap(self.main_panel, -1, bitmap = wx.Bitmap(self.img))
+		self.s_bmp = wx.StaticBitmap(self.main_panel, bitmap = wx.Bitmap(self.img))
 		
 		img_box_sizer.Add(self.s_bmp, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 		
@@ -1348,7 +1372,7 @@ class DisplayFrame(wx.Frame):
 		col_info = [["Tag", False, 200]]
 		self.tag_list = MyList(col_info, height = 270, parent = self.main_panel)
 		self.tag_list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_focus)
-		self.tag_list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_focus)
+		self.tag_list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_unfocus)
 
 		edit_tag_box_sizer = wx.BoxSizer(wx.HORIZONTAL)
 		
@@ -1405,15 +1429,15 @@ class DisplayFrame(wx.Frame):
 		self.edit_btn_box = wx.StaticBox(self.main_panel, wx.ID_ANY, "Add/Edit")
 		self.edit_box_sizer = wx.StaticBoxSizer(self.edit_btn_box, wx.VERTICAL)
 		
-		self.add_tag_btn = wx.Button(self.main_panel, -1, label = "Add tag...", name = "Add")
+		self.add_tag_btn = wx.Button(self.main_panel, label = "Add tag...", name = "Add")
 		self.add_tag_btn.Bind(wx.EVT_BUTTON, self.on_press)
 		
-		self.undo_btn = wx.Button(self.main_panel, -1, label = "Undo", name = "Undo")
+		self.undo_btn = wx.Button(self.main_panel, label = "Undo", name = "Undo")
 		self.undo_btn.Bind(wx.EVT_BUTTON, self.undo_redo)
-		self.redo_btn = wx.Button(self.main_panel, -1, label = "Redo", name = "Redo")
+		self.redo_btn = wx.Button(self.main_panel, label = "Redo", name = "Redo")
 		self.redo_btn.Bind(wx.EVT_BUTTON, self.undo_redo)
 		
-		self.edit_box_sizer.Add(self.add_tag_btn, 0, wx.ALL, 5)
+		self.edit_box_sizer.Add(self.add_tag_btn, 0, wx.EXPAND | wx.ALL, 5)
 		self.edit_box_sizer.Add(self.undo_btn, 0, wx.EXPAND | wx.ALL, 5)
 		self.edit_box_sizer.Add(self.redo_btn, 0, wx.EXPAND | wx.ALL, 5)
 		
@@ -1438,8 +1462,6 @@ class DisplayFrame(wx.Frame):
 		self.main_panel.Layout()
 		self.main_sizer.Fit(self)
 		self.Show()
-		self.SetSize((-1, wx.DisplaySize()[1]))
-		self.SetMinSize((1020, wx.DisplaySize()[1]))
 		self.Centre()
 	
 	def show_all(self, event):
@@ -1781,7 +1803,7 @@ class DisplayFrame(wx.Frame):
 				self.current_tag_boxes[self.img_data_id] = ([empty_tag])
 				self.img_data_id += 1
 
-			self.img = functions.thumb(self.img_selected[self.current_image][0], 1000, source = program_folder, height = 595)
+			self.img = functions.thumb(self.img_selected[self.current_image][0], 1000, source = program_folder, height = 580)
 		else:
 			if self.general_tags:
 				tmp = []
@@ -1791,7 +1813,7 @@ class DisplayFrame(wx.Frame):
 					self.img_data_id += 1
 				self.current_tag_count = tag_count(tmp, working_tag_list = self.current_tag_count)
 			
-			self.img = functions.thumb(self.img_selected[self.current_image][0], 1000, source = self.images_source, height = 595)
+			self.img = functions.thumb(self.img_selected[self.current_image][0], 1000, source = self.images_source, height = 580)
 		self.b_alpha = True if self.img_selected[self.current_image][0].split(".")[-1] == "png" else False
 		self.s_bmp.SetBitmap(img_to_bmp(self.img, alpha = self.b_alpha))
 
@@ -1848,17 +1870,16 @@ class DisplayFrame(wx.Frame):
 #		print("\n")
 
 	def on_focus(self, event):
-	########10180 for listctrl selected event, 10181 for deselected########
-		if 10180 == event.GetEventType():
-			focus_id = self.tag_list_content[self.tag_list.GetFocusedItem()][-1]
-			if len(self.current_tag_boxes[focus_id]) > 1:
-				self.disable_enable(to_enable = [self.edit_tag, self.edit_box, self.delete_tag])
-				self.img_draw(self.display_option, selected_index = focus_id)
-			else:
-				self.disable_enable(to_disable = [self.edit_box], to_enable = [self.edit_tag, self.delete_tag])
+		focus_id = self.tag_list_content[self.tag_list.GetFocusedItem()][-1]
+		if len(self.current_tag_boxes[focus_id]) > 1:
+			self.disable_enable(to_enable = [self.edit_tag, self.edit_box, self.delete_tag])
+			self.img_draw(self.display_option, selected_index = focus_id)
 		else:
-			self.disable_enable(to_disable = [self.edit_tag, self.edit_box, self.delete_tag])
-			self.img_draw(self.display_option)
+			self.disable_enable(to_disable = [self.edit_box], to_enable = [self.edit_tag, self.delete_tag])			
+	
+	def on_unfocus(self, event):
+		self.disable_enable(to_disable = [self.edit_tag, self.edit_box, self.delete_tag])
+		self.img_draw(self.display_option)
 		
 	def on_delete_tag(self, event):
 		self.change_counter += 1
