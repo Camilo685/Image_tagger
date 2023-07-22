@@ -2,7 +2,7 @@
 
 Distribution for linux: https://drive.google.com/file/d/1Wch-wcyCtZuMpOf3qZFnhontewc495RR/view?usp=sharing
 
-Distribution for windows: https://drive.google.com/file/d/1tQT-IuqQy3DZ4bnXKPiOg9Oxjmftmnim/view?usp=sharing
+Distribution for windows: https://drive.google.com/file/d/1ZiEqqWUTSfWJvIcogRfk2-Nlz70hIJz2/view?usp=sharing
 
 
 
